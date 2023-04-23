@@ -110,7 +110,7 @@ if __name__ == "__main__":
                 print("没有go-cqhttp，你是不是删除了?如果删除了那请自行重新下载。")
             else:
                 print("【小贴士】如果你是初次使用，请在go-cqhttp/config.yml下配置QQ号和密码，具体的内容请进去这个文件内看。")
-                os.system("start cmd /K go-cqhttp\\go-cqhttp.bat ")
+                os.system("start cmd /K go-cqhttp\\go-cqhttp.exe ")
                 print("go-cqhttp执行启动成功。")
 
         if not has_auto_installed:
