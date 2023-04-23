@@ -1,19 +1,21 @@
 # -*- coding: utf-8 -*-
-
-from git.repo import Repo
 import os
+import requests
 
 if __name__ == "__main__":
+    print("欢迎来到QQChannelChatGPT项目的Windows启动向导：）正在进行依赖检查")
+    has_auto_installed = False
     try:
         # 检测文件夹
         if not os.path.exists('QQChannelChatGPT'):
             os.mkdir('QQChannelChatGPT')
         project_path = os.path.join('QQChannelChatGPT')
         try:
+            from git.repo import Repo
             repo = Repo(project_path)
             # 检查当前commit的hash值
             commit_hash = repo.head.object.hexsha
-            print("当前commit的hash值为: " + commit_hash)
+            print("当前版本: " + commit_hash)
 
             # 得到远程仓库的origin的commit的列表
             origin = repo.remotes.origin
@@ -27,33 +29,99 @@ if __name__ == "__main__":
             # 比较两个commit的hash值
             if commit_hash != remote_commit_hash:
                 res = input("检测到项目有更新, 是否更新? (y/n): ")
-                if res == 'y':
+                if res == "y":
                     repo.remotes.origin.pull()
                     print("项目更新完毕")
-                if res == 'n':
+                if res == "n":
                     print("已取消更新")
         except:
-            print("正在从https://github.com/Soulter/QQChannelChatGPT.git拉取项目...")
-            Repo.clone_from('https://github.com/Soulter/QQChannelChatGPT.git',to_path=project_path,branch='master')
-            print("项目拉取完毕")
-            print("【重要提醒】如果你没有Python（版本>=3.8）或者Git环境, 请先安装，并设置环境变量, 否则接下来的操作会造成闪退。")
-            print("【重要提醒】Python下载地址: https://npm.taobao.org/mirrors/python/3.9.7/python-3.9.7-amd64.exe ")
-            print("【重要提醒】Git下载地址: https://registry.npmmirror.com/-/binary/git-for-windows/v2.39.2.windows.1/Git-2.39.2-64-bit.exe")
-            print("【重要提醒】安装时, 请务必勾选“Add Python to PATH”选项。Git安装时, 请务必勾选“Use Git from the Windows Command Prompt”选项。")
-            input("已确保安装了Python3.9+的版本，按下回车继续...")
+            print("未检查到QQChannelChatGPT项目，执行一键安装程序。\n--------------------------------")
 
-        finally:
-            is_Chinese = input("当前设备使用的网络是否为国内网络？ (y/n): ")
-            if is_Chinese == 'y':
-                print("正在使用阿里云镜像更新三方依赖库...")
-                os.system('python -m pip install -r QQChannelChatGPT\\requirements.txt -i https://mirrors.aliyun.com/pypi/simple/')
+            print("【步骤1】检查Python")
+            mm = os.system('python -V')
+            ins_p = True
+            if mm == 0:
+                res = input("Python环境已安装，请检查上面显示的版本版本是否为3.9及以上版本。是y 否n，输入后回车继续")
+                if res == "n":
+                    ins_p = True
+                elif res == "y":
+                    ins_p = False
+                else:
+                    input("输入错误，程序退出。")
+                    exit(0)
             else:
-                print("正在更新三方依赖库...")
-                os.system('python -m pip install -r QQChannelChatGPT\\requirements.txt')
-            print("依赖库安装完毕")
-            input("初次启动, 请先在QQChannelChatGPT/configs/config.yaml填写相关配置! 按任意键继续...")
-            print("正在启动项目...")
-            os.system('python QQChannelChatGPT\\main.py')
+                print("未检测到Python环境")
+            if ins_p:
+                print("正在自动下载Python3.10.2...")
+                f=requests.get('https://npm.taobao.org/mirrors/python/3.10.2/python-3.10.2-amd64.exe')
+                #下载文件
+                with open("python-target.exe","wb") as code:
+                    code.write(f.content)
+                input("下载完成，自动安装Python3.10.2。安装时, 请务必勾选下面的“Add Python to PATH”选项，不然无法进行。输入回车启动安装。(如果未启动，请自己启动，就在本启动器目录下。)")
+                os.system('python-target.exe')
+                input("如果安装完成，按回车继续。")
+                os.system('rm python-target.exe')
+                has_auto_installed = True
+
+
+            print("【步骤2】检查Git")
+            mm = os.system('git --version')
+            ins_g = True
+            if mm == 0:
+                res = print("Git环境已安装.")
+                ins_g = False
+            else:
+                print("未检测到Git环境，正在下载...")
+
+            if ins_g:
+                f=requests.get('https://npm.taobao.org/mirrors/git-for-windows/v2.39.2.windows.1/Git-2.39.2-64-bit.exe')
+                #下载文件
+                with open("git-target.exe","wb") as code:
+                    code.write(f.content)
+                input("下载完成，自动安装Git。输入回车启动安装。(如果未启动，请自己启动，就在本启动器目录下。)")
+                print("【重要消息】在安装时，一路Next下去，直到'Adjusting Your PATH environment'那里，确保选的是第二个选项。")
+                os.system('git-target.exe')
+                input("如果安装完成，按回车继续。")
+                os.system('rm git-target.exe')
+                has_auto_installed = True
+
+            if has_auto_installed:
+                print("--------------------------------")
+                input("至此，前期准备安装完成！请务必重启本程序（重启电脑会更好），否则接下来一定会报错。回车继续")
+
+            print("如果您在中国大陆内，本项目全程挂全局代理使用会提高成功率。")
+            print("正在从https://github.com/Soulter/QQChannelChatGPT.git拉取最新项目...")
+            try:
+                Repo.clone_from('https://github.com/Soulter/QQChannelChatGPT.git',to_path=project_path,branch='master')
+                print("项目拉取完毕")
+            except BaseException as e:
+                print(e)
+                mm = os.system('git --version')
+                if mm == 0:
+                    input("项目拉取失败，初步判断是网络问题，请挂代理，按下回车键退出...")
+                else:
+                    input("项目拉取失败，大概率为Git安装问题，请检查Git是否安装，并且是否设置了环境变量，按下回车键退出...")
+                exit(0)
+                input("退出失败，请你自己右上角退出。")
+
+        res = input("是否要使用QQ机器人？（不是QQ频道） 输入y是，输入其他则不启动，回车继续。")
+        if res == 'y':
+            if not os.path.exists('go-cqhttp'):
+                print("没有go-cqhttp，你是不是删除了?如果删除了那请自行重新下载。")
+            else:
+                print("【小贴士】如果你是初次使用，请在go-cqhttp/config.yml下配置QQ号和密码，具体的内容请进去这个文件内看。")
+                os.system("start cmd /K go-cqhttp\\go-cqhttp.bat ")
+                print("go-cqhttp执行启动成功。")
+
+        if not has_auto_installed:
+            print("初次启动, 请先在QQChannelChatGPT/configs/config.yaml填写相关配置! 等待5秒继续...")
+            import time
+            time.sleep(5)
+        else:
+            input("初次启动, 请先在QQChannelChatGPT/configs/config.yaml填写相关配置! 如果已经填写，回车继续。")
+
+        print("正在启动项目...")
+        os.system('python QQChannelChatGPT\\main.py')
     except BaseException as e:
         print(e)
         input("程序出错。首先请检查是否设置了Pyhton和Git的环境变量, 不行再截图发给QQ：905617992.按下回车键退出...")
