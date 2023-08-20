@@ -40,7 +40,7 @@ if __name__ == "__main__":
             print("未检查到QQChannelChatGPT项目，将自动安装安装。\n--------------------------------")
 
             print("【步骤1】检查Python")
-            mm = os.system('python3 -V')
+            mm = os.system('python -V')
             ins_p = True
             if mm == 0:
                 res = input("Python环境已安装，请检查上面显示的版本版本是否为3.9及以上版本。是y 否n，输入后回车继续")
@@ -103,7 +103,7 @@ if __name__ == "__main__":
                     input("项目拉取失败。网络问题")
                 else:
                     input("项目拉取失败，大概率为Git安装问题，请检查Git是否安装，并且是否设置了环境变量，按下回车键退出...")
-                exit(0)
+                raise e
 
         # print("提示：如果要启用go-cq，可以")
         # res = input("是否要使用QQ机器人？（不是QQ频道） 输入y是，输入其他则不启动，回车继续。")
@@ -115,7 +115,7 @@ if __name__ == "__main__":
         #         os.system("start cmd /K go-cqhttp\\go-cqhttp.exe ")
         #         print("go-cqhttp执行启动成功。")
 
-        print("初次启动, 请先在QQChannelChatGPT/configs/config.yaml填写相关配置! 等待5秒继续...")
+        print("如果您是初次启动, 请先在QQChannelChatGPT/configs/config.yaml填写或者修改相关机器人配置! 等待5秒继续...")
         import time
         time.sleep(5)
 
@@ -124,7 +124,7 @@ if __name__ == "__main__":
         #     input("初次启动, 请先在QQChannelChatGPT/configs/config.yaml填写相关配置! 如果已经填写，回车继续。")
 
         print("正在启动...")
-        os.system('python3 QQChannelChatGPT\\main.py')
+        os.system('python QQChannelChatGPT\\main.py')
     except BaseException as e:
         print(e)
         input("程序出错，可以加群322154837反馈。按下回车键退出...")
