@@ -1,9 +1,14 @@
 # -*- coding: utf-8 -*-
 import os
 import requests
+import zipfile
+import warnings
+import general_utils as gu
+from requests.exceptions import ProxyError
+warnings.filterwarnings("ignore")
 
 if __name__ == "__main__":
-    print("欢迎来到QQChannelChatGPT项目的Windows启动向导，正在进行依赖检查")
+    gu.log("=== 欢迎来到QQChannelChatGPT项目Windows启动向导，正在进行依赖检查 ===", fg=gu.FG_COLORS["blue"])
     has_auto_installed = False
     try:
         # 检测文件夹
@@ -15,7 +20,7 @@ if __name__ == "__main__":
             repo = Repo(project_path)
             # 检查当前commit的hash值
             commit_hash = repo.head.object.hexsha
-            print("当前版本: " + commit_hash)
+            gu.log("当前版本: " + str(commit_hash)[:7])
 
             # 得到远程仓库的origin的commit的列表
             origin = repo.remotes.origin
@@ -25,25 +30,25 @@ if __name__ == "__main__":
                 pass
             # 得到远程仓库的commit的hash值
             remote_commit_hash = origin.refs.master.commit.hexsha
-            print("最新版本: " + remote_commit_hash)
+            gu.log("最新版本: " + str(remote_commit_hash)[:7])
             # 比较两个commit的hash值
             if commit_hash != remote_commit_hash:
                 res = input("检测到项目有更新, 是否更新? (y/n): ")
                 if res == "y":
                     repo.remotes.origin.pull()
-                    print("项目更新完毕")
+                    gu.log("项目更新完毕")
                 if res == "n":
-                    print("已取消更新")
+                    gu.log("已取消更新")
             else:
-                print("已是最新版本")
+                gu.log("已是最新版本")
         except:
-            print("未检查到QQChannelChatGPT项目，将自动安装安装。\n--------------------------------")
+            gu.log("未检查到QQChannelChatGPT项目，将自动安装安装。\n--------------------------------")
 
-            print("【步骤1】检查Python")
+            gu.log("【步骤1】检查Python", bg=gu.FG_COLORS["yellow"])
             mm = os.system('python -V')
             ins_p = True
             if mm == 0:
-                res = input("Python环境已安装，请检查上面显示的版本版本是否为3.9及以上版本。是y 否n，输入后回车继续")
+                res = input("Python环境已安装，请检查上面显示的版本版本是否为3.9及以上版本。\ny: 是\nn: 否\n\n输入后回车继续\n")
                 if res == "n":
                     ins_p = True
                 elif res == "y":
@@ -52,52 +57,72 @@ if __name__ == "__main__":
                     input("输入错误，程序退出。")
                     exit(0)
             else:
-                print("未检测到Python环境")
+                gu.log("未检测到Python环境")
             if ins_p:
-                print("正在自动下载Python3.10.2...")
-                f=requests.get('https://npm.taobao.org/mirrors/python/3.10.2/python-3.10.2-amd64.exe')
+                gu.log("正在自动下载Python3.10...")
+                try:
+                    f = requests.get('https://registry.npmmirror.com/-/binary/python/3.10.2/python-3.10.2-embed-amd64.zip', verify=False)
+                except ProxyError:
+                    input("下载错误。请关掉本机上运行的代理程序，然后按回车键继续。")
+                    f = requests.get('https://registry.npmmirror.com/-/binary/python/3.10.2/python-3.10.2-embed-amd64.zip', verify=False)
+                # f=requests.get('https://npm.taobao.org/mirrors/python/3.10.2/python-3.10.2-amd64.exe')
                 #下载文件
-                with open("python-target.exe","wb") as code:
+                with open("python.zip","wb") as code:
                     code.write(f.content)
-                input("下载完成，自动安装Python3.10.2。安装时, 请务必勾选下面的“Add Python to PATH”选项，不然无法进行。输入回车启动安装。(如果未启动，请自己启动，就在本启动器目录下。)")
-                os.system('python-target.exe')
-                input("如果安装完成，按回车继续。")
-                # os.system('rm python-target.exe')
+                gu.log("下载完成，正在解压。")
+                # os.system('python-target.exe')
+                # 解压zip
+                with zipfile.ZipFile('python.zip', 'r') as zip_ref:
+                    zip_ref.extractall('python')
+                gu.log("解压完成。")
+                gu.log("正在进行一些必要配置(pth)")
+                # 修改python310._pth
+                with open('python/python310._pth', 'w') as f:
+                    f.write('python310.zip\n.\n../QQChannelChatGPT\nimport site\n')
+                gu.log("配置完毕")
+                # 删除zip
+                try:
+                    os.remove('python.zip')
+                    gu.log("已删除无用文件")
+                except:
+                    gu.log("删除无用文件失败，请手动删除python.zip。")
+                gu.log("安装pip3, 请等待。")
+                os.system('python\\python.exe get-pip.py')
+                gu.log("pip3安装完毕")
+                gu.log("Python安装完毕")
                 has_auto_installed = True
 
-
-            print("【步骤2】检查Git")
+            gu.log("【步骤2】检查Git")
             mm = os.system('git --version')
             ins_g = True
             if mm == 0:
-                res = print("Git环境已安装.")
+                res = gu.log("Git环境已安装.")
                 ins_g = False
             else:
-                print("未检测到Git环境，正在下载...")
+                gu.log("未检测到Git环境，正在下载...")
 
             if ins_g:
-                f=requests.get('https://npm.taobao.org/mirrors/git-for-windows/v2.39.2.windows.1/Git-2.39.2-64-bit.exe')
+                f=requests.get('https://npm.taobao.org/mirrors/git-for-windows/v2.39.2.windows.1/Git-2.39.2-64-bit.exe',verify=False)
                 #下载文件
                 with open("git-target.exe","wb") as code:
                     code.write(f.content)
                 input("下载完成，自动安装Git。输入回车启动安装。(如果未启动，请自己启动，就在本启动器目录下。)")
-                print("【重要消息】在安装时，一路Next下去，直到'Adjusting Your PATH environment'那里，确保选的是第二个选项。")
+                gu.log("【重要消息】在安装时，一路Next下去，直到'Adjusting Your PATH environment'那里，确保选的是第二个选项。")
                 os.system('git-target.exe')
                 input("如果安装完成，按回车继续。")
                 # os.system('rm git-target.exe')
                 has_auto_installed = True
 
             if has_auto_installed:
-                print("--------------------------------")
-                input("安装完毕。请右上角关掉本程序然后重启。")
+                gu.log("--------------------------------")
 
-            # print("如果您在中国大陆内，本项目全程挂全局代理使用会提高成功率。")
-            print("正在从https://gitee.com/soulter/QQChannelChatGPT.git拉取最新项目...")
+            # gu.log("如果您在中国大陆内，本项目全程挂全局代理使用会提高成功率。")
+            gu.log("正在从 https://gitee.com/soulter/QQChannelChatGPT.git 拉取最新代码。")
             try:
                 Repo.clone_from('https://gitee.com/soulter/QQChannelChatGPT.git',to_path=project_path,branch='master')
-                print("项目拉取完毕")
+                gu.log("项目拉取完毕")
             except BaseException as e:
-                print(e)
+                gu.log(e)
                 mm = os.system('git --version')
                 if mm == 0:
                     input("项目拉取失败。网络问题")
@@ -105,26 +130,19 @@ if __name__ == "__main__":
                     input("项目拉取失败，大概率为Git安装问题，请检查Git是否安装，并且是否设置了环境变量，按下回车键退出...")
                 raise e
 
-        # print("提示：如果要启用go-cq，可以")
-        # res = input("是否要使用QQ机器人？（不是QQ频道） 输入y是，输入其他则不启动，回车继续。")
-        # if res == 'y':
-        #     if not os.path.exists('go-cqhttp'):
-        #         print("没有go-cqhttp，你是不是删除了?如果删除了那请自行重新下载。")
-        #     else:
-        #         print("【小贴士】如果你是初次使用，请在go-cqhttp/config.yml下配置QQ号和密码，具体的内容请进去这个文件内看。")
-        #         os.system("start cmd /K go-cqhttp\\go-cqhttp.exe ")
-        #         print("go-cqhttp执行启动成功。")
+        py_pth = "python"
+        if os.path.exists("python") and os.path.exists("python\\python.exe"):
+            py_pth = "python\\python.exe"
+        sel = input("请选择网络环境：\n1. 中国大陆内\n其他. 中国大陆外\n")
 
-        print("如果您是初次启动, 请先在QQChannelChatGPT/configs/config.yaml填写或者修改相关机器人配置! 等待5秒继续...")
-        import time
-        time.sleep(5)
-
-        # if not has_auto_installed:
-        # else:
-        #     input("初次启动, 请先在QQChannelChatGPT/configs/config.yaml填写相关配置! 如果已经填写，回车继续。")
-
-        print("正在启动...")
-        os.system('python QQChannelChatGPT\\main.py')
+        if sel == "1":
+            gu.log("正在启动（网络环境：cn）...")
+            os.system(f'{py_pth} QQChannelChatGPT\\main.py -cn')
+        else:
+            gu.log("正在启动（网络环境：non-cn）...")
+            os.system(f'{py_pth} QQChannelChatGPT\\main.py')
+        
+        
     except BaseException as e:
-        print(e)
+        gu.log(e)
         input("程序出错，可以加群322154837反馈。按下回车键退出...")
