@@ -117,12 +117,15 @@ del latest.txt
 :RunAstrBot
 :: 切换到 AstrBot 或 QQChannelChatGPT 目录并执行 main.py
 cd AstrBot || cd QQChannelChatGPT
+echo [信息] 正在检查依赖更新.
+echo.
+%PYTHON_CMD% -m pip install -r requirements.txt
+
 echo [信息] 正在启动 AstrBot.
 echo.
 %PYTHON_CMD% main.py
 
 cd ..
-
 
 :end
 endlocal
