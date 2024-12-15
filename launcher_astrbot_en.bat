@@ -6,7 +6,7 @@ setlocal
 cls
 echo.
 echo =========================
-echo    AstrBot Launcher v0.1.0
+echo    AstrBot Launcher v0.1.2
 echo =========================
 echo.
 
@@ -30,14 +30,14 @@ for /f "tokens=1,2 delims=." %%a in ("%PYTHON_VERSION%") do (
     set PYTHON_MINOR=%%b
 )
 
-:: Check if Python version is less than 3.9
+:: Check if Python version is less than 3.10
 if %PYTHON_MAJOR% lss 3 (
-    echo [ERROR] Python 3.9 or higher is required. Current version is %PYTHON_VERSION%.
+    echo [ERROR] Python 3.10 or higher is required. Current version is %PYTHON_VERSION%.
     goto end
 )
 
-if %PYTHON_MAJOR%==3 if %PYTHON_MINOR% lss 9 (
-    echo [ERROR] Python 3.9 or higher is required. Current version is %PYTHON_VERSION%.
+if %PYTHON_MAJOR%==3 if %PYTHON_MINOR% lss 10 (
+    echo [ERROR] Python 3.10 or higher is required. Current version is %PYTHON_VERSION%.
     goto end
 )
 
@@ -48,7 +48,7 @@ echo.
 :: Check if AstrBot or QQChannelChatGPT folder exists
 if not exist AstrBot (
     if not exist QQChannelChatGPT (
-        echo [INFO] AstrBot or QQChannelChatGPT folder not found. Downloading the latest version from GitHub...
+        echo [INFO] AstrBot folder not found. Downloading the latest version from GitHub...
         call :downloadLatestRelease
         goto end
     )
@@ -56,7 +56,7 @@ if not exist AstrBot (
 
 echo [INFO] AstrBot or QQChannelChatGPT folder already exists. No need to download.
 echo.
-goto RunAstrBot
+goto SetupAndRun
 
 :downloadLatestRelease
 :: Call GitHub API to get the latest release information
@@ -113,16 +113,34 @@ echo.
 del latest.zip
 del latest.txt
 
-:RunAstrBot
-:: Change to AstrBot or QQChannelChatGPT directory and run main.py
-cd AstrBot || cd QQChannelChatGPT
-echo [INFO] Checking for dependency updates.
-echo.
-%PYTHON_CMD% -m pip install -r requirements.txt
+goto SetupAndRun
 
+:SetupAndRun
+:: Change to AstrBot or QQChannelChatGPT directory
+cd AstrBot || cd QQChannelChatGPT
+
+:: Set up a virtual environment
+echo [INFO] Setting up a virtual environment...
+if not exist venv (
+    %PYTHON_CMD% -m venv venv
+)
+
+:: Activate the virtual environment
+call venv\Scripts\activate.bat
+
+:: Check for dependency updates
+echo [INFO] Checking for dependency updates. Using uv.
+python -m pip install --upgrade pip >nul
+python -m pip install uv >nul
+python -m uv pip install -r requirements.txt -i https://mirrors.tuna.tsinghua.edu.cn/pypi/web/simple
+
+:: Run the main script
 echo [INFO] Starting AstrBot.
 echo.
 %PYTHON_CMD% main.py
+
+:: Deactivate the virtual environment
+call venv\Scripts\deactivate.bat
 
 cd ..
 
