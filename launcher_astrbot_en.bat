@@ -6,7 +6,7 @@ setlocal
 cls
 echo.
 echo =========================
-echo    AstrBot Launcher v0.1.2
+echo    AstrBot Launcher v0.1.3
 echo =========================
 echo.
 
@@ -15,7 +15,7 @@ set PYTHON_CMD=python
 :: Check if Python is installed
 %PYTHON_CMD% --version >nul 2>&1
 if %errorlevel% neq 0 (
-    echo [ERROR] Python is not installed. Please install Python 3.9 or higher.
+    echo [ERROR] Python is not installed. Please install Python 3.10 or higher.
     goto end
 )
 
