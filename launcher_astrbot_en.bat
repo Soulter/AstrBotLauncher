@@ -130,8 +130,8 @@ call venv\Scripts\activate.bat
 
 :: Check for dependency updates
 echo [INFO] Checking for dependency updates. Using uv.
-python -m pip install --upgrade pip >nul
-python -m pip install uv >nul
+python -m pip install --upgrade pip -i https://mirrors.tuna.tsinghua.edu.cn/pypi/web/simple >nul
+python -m pip install uv -i https://mirrors.tuna.tsinghua.edu.cn/pypi/web/simple >nul
 python -m uv pip install -r requirements.txt -i https://mirrors.tuna.tsinghua.edu.cn/pypi/web/simple
 
 :: Run the main script
