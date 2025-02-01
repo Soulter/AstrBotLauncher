@@ -141,7 +141,7 @@ python -m uv pip install -r requirements.txt -i %MIRROR_URL%
 :: Run the main script
 echo [INFO] Starting AstrBot.
 echo.
-%PYTHON_CMD% main.py
+python main.py
 
 :: Deactivate the virtual environment
 call venv\Scripts\deactivate.bat
