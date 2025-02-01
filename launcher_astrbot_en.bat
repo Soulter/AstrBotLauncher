@@ -12,9 +12,7 @@ echo.
 
 set PYTHON_CMD=python
 
-:: Ask user for the mirror URL (defaults to Aliyun mirror)
-set /p MIRROR_URL=Enter the mirror URL (or press Enter to use default: https://mirrors.aliyun.com/pypi/simple): 
-if "%MIRROR_URL%"=="" set MIRROR_URL=https://mirrors.aliyun.com/pypi/simple
+set MIRROR_URL=https://mirrors.aliyun.com/pypi/simple
 
 :: Check if Python is installed
 %PYTHON_CMD% --version >nul 2>&1
