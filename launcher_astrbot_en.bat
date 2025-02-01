@@ -12,6 +12,10 @@ echo.
 
 set PYTHON_CMD=python
 
+:: Ask user for the mirror URL (defaults to Aliyun mirror)
+set /p MIRROR_URL=Enter the mirror URL (or press Enter to use default: https://mirrors.aliyun.com/pypi/simple): 
+if "%MIRROR_URL%"=="" set MIRROR_URL=https://mirrors.aliyun.com/pypi/simple
+
 :: Check if Python is installed
 %PYTHON_CMD% --version >nul 2>&1
 if %errorlevel% neq 0 (
@@ -129,11 +133,10 @@ if not exist venv (
 call venv\Scripts\activate.bat
 
 :: Check for dependency updates
-echo [INFO] Checking for dependency updates. Using uv.
-echo [INFO] Using http://mirrors.aliyun.com/pypi/simple mirror.
-python -m pip install --upgrade pip -i http://mirrors.aliyun.com/pypi/simple --trusted-host mirrors.aliyun.com
-python -m pip install uv -i http://mirrors.aliyun.com/pypi/simple --trusted-host mirrors.aliyun.com
-python -m uv pip install -r requirements.txt -i http://mirrors.aliyun.com/pypi/simple --trusted-host mirrors.aliyun.com
+echo [INFO] Checking for dependency updates. Using mirror: %MIRROR_URL%.
+python -m pip install --upgrade pip -i %MIRROR_URL% >nul
+python -m pip install uv -i %MIRROR_URL% >nul
+python -m uv pip install -r requirements.txt -i %MIRROR_URL%
 
 :: Run the main script
 echo [INFO] Starting AstrBot.
