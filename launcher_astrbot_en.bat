@@ -131,9 +131,9 @@ call venv\Scripts\activate.bat
 :: Check for dependency updates
 echo [INFO] Checking for dependency updates. Using uv.
 echo [INFO] Using http://mirrors.aliyun.com/pypi/simple mirror.
-python -m pip install --upgrade pip -i http://mirrors.aliyun.com/pypi/simple
-python -m pip install uv -i http://mirrors.aliyun.com/pypi/simple
-python -m uv pip install -r requirements.txt -i http://mirrors.aliyun.com/pypi/simple
+python -m pip install --upgrade pip -i http://mirrors.aliyun.com/pypi/simple --trusted-host mirrors.aliyun.com
+python -m pip install uv -i http://mirrors.aliyun.com/pypi/simple --trusted-host mirrors.aliyun.com
+python -m uv pip install -r requirements.txt -i http://mirrors.aliyun.com/pypi/simple --trusted-host mirrors.aliyun.com
 
 :: Run the main script
 echo [INFO] Starting AstrBot.
