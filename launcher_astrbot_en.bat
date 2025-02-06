@@ -62,7 +62,7 @@ goto SetupAndRun
 
 :downloadLatestRelease
 :: Call GitHub API to get the latest release information
-powershell -Command "$release = Invoke-WebRequest -Uri 'https://api.github.com/repos/Soulter/AstrBot/releases/latest' -ErrorAction Stop | ConvertFrom-Json; echo $release.zipball_url" > latest.txt
+powershell -Command "$release = Invoke-WebRequest -Uri 'https://api.github.com/repos/Soulter/AstrBot/releases/latest' -UseBasicParsing -ErrorAction Stop | ConvertFrom-Json; echo $release.zipball_url" > latest.txt
 
 :: Check if the download URL was successfully obtained
 if not exist latest.txt (
