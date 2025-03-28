@@ -101,7 +101,7 @@ if errorlevel 1 (
 )
 
 :: Rename the extracted folder to AstrBot
-for /d %%I in ("Soulter-AstrBot-*") do (
+for /d %%I in ("AstrBotDevs-AstrBot-*") do (
     if exist "%%I" (
         ren "%%I" AstrBot
     )
